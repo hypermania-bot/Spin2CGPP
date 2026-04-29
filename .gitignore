@@ -1,0 +1,8 @@
+Overleaf/
+Code/output/
+Code/asset/
+*.log
+*.aux
+*.out
+*.toc
+*.pdf

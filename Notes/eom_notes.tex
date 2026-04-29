@@ -1,0 +1,146 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=1in]{geometry}
+\usepackage{amsmath,amssymb,mathtools,bm}
+\usepackage{hyperref}
+\usepackage{physics}
+\usepackage{enumitem}
+
+\title{Checking the Mode Equations in\\ \textit{Cosmological gravitational particle production of massive spin-2 particles}}
+\author{Project notes for \texttt{Spin2CGPP}}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section{Scope}
+These notes document a reproducible check of the mode equations in Siyang Ling, Edward W. Kolb, Andrew J. Long, and Rachel A. Rosen, \texttt{arXiv:2302.04390}. The target equations are the sector-by-sector equations of motion in section 3 of the paper:
+\begin{itemize}[leftmargin=1.5em]
+\item minimal matter coupling: tensor, vector, and canonical scalar equations;
+\item nonminimal matter coupling: tensor, vector, and scalar equations.
+\end{itemize}
+
+The scripts in \texttt{Code/script/} start from the published quadratic sector Lagrangians and reproduce the final mode equations by explicit Euler-Lagrange variation, including the canonical field redefinitions used in the paper.
+
+\section{What the automation does}
+The derivation pipeline is organized around a single repeated pattern. If a sector Lagrangian has the form
+\begin{equation}
+\mathcal{L} = K(\eta)\, q'^{\,2} - M(\eta)\, q^2,
+\end{equation}
+then after the canonical redefinition
+\begin{equation}
+q(\eta) = \frac{\chi(\eta)}{\sqrt{2K(\eta)}}
+\end{equation}
+and after discarding a total derivative, the Lagrangian becomes
+\begin{equation}
+\mathcal{L} = \frac{1}{2}\chi'^{\,2} - \frac{1}{2}\omega_k^2(\eta)\chi^2,
+\qquad
+\omega_k^2(\eta) = \frac{4KM + (K')^2 - 2K K''}{4K^2}.
+\end{equation}
+The Mathematica helper \texttt{CanonicalOmegaSquared} implements exactly this identity.
+
+For the minimal scalar sector, the paper already presents the canonically normalized two-field system
+\begin{equation}
+\mathcal{L}_S =
+\frac12 |\chi_\Pi'|^2 - \frac12 \omega_\Pi^2 |\chi_\Pi|^2
++ \frac12 |\chi_{\mathcal B}'|^2 - \frac12 \omega_{\mathcal B}^2 |\chi_{\mathcal B}|^2
++ \sigma_1 \chi_\Pi^\ast \chi_{\mathcal B}' - \sigma_0 \chi_\Pi^\ast \chi_{\mathcal B}.
+\end{equation}
+In the Mathematica checks, I model the derivative mixing with an equivalent real-field convention. That convention differs from the paper's complex-mode presentation by a total-derivative reshuffling, so an explicit $\sigma_1'/2$ shift appears in the off-diagonal mass-like term. After accounting for that convention choice, the coupled equations agree with the structure quoted in the paper:
+\begin{align}
+\chi_\Pi'' + \omega_\Pi^2 \chi_\Pi - \sigma_1 \chi_{\mathcal B}' + \sigma_0 \chi_{\mathcal B} &= 0, \\
+\chi_{\mathcal B}'' + \omega_{\mathcal B}^2 \chi_{\mathcal B} + \sigma_1 \chi_\Pi' + \sigma_0 \chi_\Pi &= 0.
+\end{align}
+
+\section{Minimal matter coupling}
+\subsection{Tensor sector}
+The paper starts from
+\begin{equation}
+\mathcal{L}_T = \frac12 a^2 \left[ D_{ij}' D_{ij}' - \partial_k D_{ij}\partial_k D_{ij} - a^2 m^2 D_{ij}D_{ij}\right].
+\end{equation}
+After Fourier transforming and replacing $\partial_k \partial_k \to -k^2$, one obtains a single-mode Lagrangian of the form
+\begin{equation}
+\mathcal{L}_{T,k} = \frac12 a^2 \left[ D'^2 - (k^2 + a^2 m^2) D^2 \right].
+\end{equation}
+Using $\chi = aD$, the code shows
+\begin{equation}
+\mathcal{L}_{T,k} = \frac12 \chi'^2 - \frac12 \left(k^2 + a^2 m^2 - \frac{a''}{a}\right)\chi^2
+\end{equation}
+up to a total derivative. With $H = a'/a^2$, the background identity
+\begin{equation}
+\frac{a''}{a} = 2a^2 H^2 + aH'
+\end{equation}
+gives
+\begin{equation}
+\omega_k^2 = k^2 + a^2 m^2 - 2a^2 H^2 - aH',
+\end{equation}
+which matches eq.~(3.8) of the paper.
+
+\subsection{Vector sector}
+The reduced Fourier-space Lagrangian quoted in the paper is
+\begin{equation}
+\mathcal{L}_{V,k} = K_C |C'|^2 - M_C |C|^2,
+\qquad
+K_C = \frac{a^4 k^2 m^2}{k^2 + a^2 m^2},
+\qquad
+M_C = a^4 k^2 m^2.
+\end{equation}
+Applying the generic canonical-normalization identity above gives
+\begin{equation}
+\omega_k^2 =
+\frac{4K_C M_C + (K_C')^2 - 2 K_C K_C''}{4K_C^2}.
+\end{equation}
+The script rewrites this result as
+\begin{equation}
+\omega_k^2 = k^2 + a^2 m^2 - \frac{f''}{f},
+\qquad
+f = \frac{a^2}{\sqrt{k^2 + a^2 m^2}},
+\end{equation}
+which is exactly eq.~(3.13).
+
+\subsection{Scalar sector}
+The minimally coupled scalar sector is the technically hardest part of the paper. The full reduction from $(A,B,E,F,\hat\varphi_v)$ to $(\Pi,\mathcal B)$ is not rederived in these scripts. Instead, the automation begins with the final canonical quadratic action displayed in eq.~(3.52), varies it, and verifies the published coupled mode equations exactly.
+
+More precisely, the code checks the final scalar equations modulo the harmless convention change that shifts $\sigma_0 \to \sigma_0 \mp \sigma_1'/2$ between the two Euler-Lagrange equations in a real-field representation. This is the only residual bookkeeping subtlety in the current automation.
+
+This means the current automation checks the final scalar equations from the final scalar action, but it does not yet reconstruct the intermediate constraint elimination from the covariant quadratic action.
+
+\section{Nonminimal matter coupling}
+\subsection{Tensor sector}
+The tensor-sector action in the nonminimal model is
+\begin{equation}
+\mathcal{L}_T = \frac12 a^2 \left[D'^2 - \left(k^2 + a^2(m^2-\Lambda+3H^2+2a^{-1}H')\right)D^2\right].
+\end{equation}
+Again using $\chi = aD$, the canonical form is
+\begin{equation}
+\mathcal{L}_{T,k} = \frac12 \chi'^2 - \frac12 \omega_k^2 \chi^2
+\end{equation}
+with
+\begin{equation}
+\omega_k^2 = k^2 + a^2 m^2 - a^2 \Lambda + a^2 H^2 + aH',
+\end{equation}
+matching eq.~(3.58).
+
+\subsection{Vector and scalar sectors}
+The paper reduces both the vector and scalar sectors to single-field quadratic actions of the same form
+\begin{equation}
+\mathcal{L} = K(\eta)\,q'^{\,2} - M(\eta)\,q^2.
+\end{equation}
+The Mathematica scripts apply the same canonical-normalization identity and reproduce the quoted frequency formulas
+\begin{align}
+\omega_{V,k}^2 &= \frac{4K_C M_C + (K_C')^2 - 2K_C K_C''}{4K_C^2}, \\
+\omega_{S,k}^2 &= \frac{4K_B M_B + (K_B')^2 - 2K_B K_B''}{4K_B^2},
+\end{align}
+which are eqs.~(3.66) and (3.73).
+
+\section{Files}
+\begin{itemize}[leftmargin=1.5em]
+\item \texttt{Code/script/Spin2CGPP.wl}: derivation helpers and symbolic checks.
+\item \texttt{Code/script/derive\_eoms.wls}: human-readable driver that prints each check.
+\item \texttt{Code/test/run\_tests.wls}: Mathematica regression tests.
+\item \texttt{Code/test/run\_tests.sh}: shell entry point for the tests.
+\end{itemize}
+
+\section{Current limitation}
+The largest remaining gap is the full constraint reduction of the minimal scalar sector from the covariant quadratic action, and likewise the earlier elimination steps for the nonminimal scalar sector. The present project fully checks the published final mode equations from the published reduced sector actions, but it does not yet reconstruct every intermediate algebraic step that the paper likely performed with \texttt{xTensor}.
+
+\end{document}
