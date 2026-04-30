@@ -10,6 +10,6 @@ Reproduce and check the mode equations in Siyang Ling et al., "Cosmological grav
 - `Notes/`: detailed derivation notes prepared for Overleaf upload.
 
 ## Next Steps
-1. Finish the derivation scripts for all tensor, vector, and scalar mode equations used in sections 3 and 4 of the paper.
-2. Run the Mathematica checks and keep the test outputs green.
-3. Push the notes to the linked Overleaf project and compile them there.
+1. Simplify the final coupled scalar equations from `Code/script/derive_scalar_mode_eoms.wls` into the paper's published `{K_\varphi,K_B,L_2,L_1,L_0,\dots}` coefficient basis.
+2. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` to understand why naive Hessian-based elimination looks misleading even though the sequential `F -> A -> E` chain produces the expected two-field system.
+3. Update the notes with the successful sequential elimination chain and add a comparison against the closed-form equations in the paper.

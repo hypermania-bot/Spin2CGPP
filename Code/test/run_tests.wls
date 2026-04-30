@@ -35,6 +35,18 @@ results = {
     And @@ (zeroQ /@ Values[Spin2CGPP`CheckNonminimalScalar[\[Eta]]]),
     True,
     TestID -> "nonminimal-scalar"
+  ],
+  VerificationTest[
+    RunProcess[
+      {
+        "wolframscript",
+        "-file",
+        FileNameJoin[{DirectoryName[$InputFileName], "test_scalar_mode_chain.wls"}]
+      },
+      "ExitCode"
+    ],
+    0,
+    TestID -> "minimal-scalar-covariant-chain"
   ]
 };
 

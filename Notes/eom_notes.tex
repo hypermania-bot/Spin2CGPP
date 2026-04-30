@@ -98,11 +98,31 @@ f = \frac{a^2}{\sqrt{k^2 + a^2 m^2}},
 which is exactly eq.~(3.13).
 
 \subsection{Scalar sector}
-The minimally coupled scalar sector is the technically hardest part of the paper. The full reduction from $(A,B,E,F,\hat\varphi_v)$ to $(\Pi,\mathcal B)$ is not rederived in these scripts. Instead, the automation begins with the final canonical quadratic action displayed in eq.~(3.52), varies it, and verifies the published coupled mode equations exactly.
+The minimally coupled scalar sector is the technically hardest part of the paper. The current project now reconstructs the scalar reduction directly from the covariant quadratic action. The scripts
+\begin{itemize}[leftmargin=1.5em]
+\item \texttt{Code/script/scalar\_equation\_rank\_check.wls},
+\item \texttt{Code/script/derive\_scalar\_mode\_eoms.wls}, and
+\item \texttt{Code/test/test\_scalar\_mode\_chain.wls}
+\end{itemize}
+implement the scalar SVT ansatz, perform the field redefinition
+\begin{equation}
+\hat{\varphi}_v = \varphi_v - \frac{a^{-1}\bar\phi'}{\Mpl H} A,
+\end{equation}
+and then eliminate the constrained variables in the order
+\begin{equation}
+F_\pm \longrightarrow A_\pm \longrightarrow E_\pm.
+\end{equation}
 
-More precisely, the code checks the final scalar equations modulo the harmless convention change that shifts $\sigma_0 \to \sigma_0 \mp \sigma_1'/2$ between the two Euler-Lagrange equations in a real-field representation. This is the only residual bookkeeping subtlety in the current automation.
+This ordering is important. A naive Hessian analysis of the partially reduced Lagrangian suggests that $A$ remains dynamical, but that conclusion is misleading. After solving the $F_\pm$ constraints, the $E_\pm$ equations solve $A_\pm$ without introducing $A_\pm''$; after substituting those solutions, the $A_\pm$ equations solve $E_\pm$. Only after this full sequential elimination does the expected coupled two-field system in $(B,\hat\varphi_v)$ emerge.
 
-This means the current automation checks the final scalar equations from the final scalar action, but it does not yet reconstruct the intermediate constraint elimination from the covariant quadratic action.
+The resulting equations of motion are denoted \texttt{finalB} and \texttt{finalP} in \texttt{derive\_scalar\_mode\_eoms.wls}. The test script verifies three structural facts directly:
+\begin{enumerate}[leftmargin=1.5em]
+\item both final equations contain $B''$ and $\hat\varphi_v''$;
+\item the final $2\times2$ acceleration matrix has rank $2$;
+\item the derivation starts from the covariant action rather than the published reduced scalar action.
+\end{enumerate}
+
+The remaining unsolved step is simplification rather than derivation. The final equations are currently too large to compare term-by-term to the paper's closed-form coefficient basis $(K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0)$ without further symbolic reduction.
 
 \section{Nonminimal matter coupling}
 \subsection{Tensor sector}
@@ -136,11 +156,14 @@ which are eqs.~(3.66) and (3.73).
 \begin{itemize}[leftmargin=1.5em]
 \item \texttt{Code/script/Spin2CGPP.wl}: derivation helpers and symbolic checks.
 \item \texttt{Code/script/derive\_eoms.wls}: human-readable driver that prints each check.
+\item \texttt{Code/script/derive\_scalar\_mode\_eoms.wls}: covariant-to-scalar sequential elimination chain for the minimally coupled scalar sector.
+\item \texttt{Code/script/check\_ds\_scalar\_limit.wls}: de Sitter-limit diagnostic for the pure spin-2 scalar reduction.
 \item \texttt{Code/test/run\_tests.wls}: Mathematica regression tests.
+\item \texttt{Code/test/test\_scalar\_mode\_chain.wls}: regression test for the covariant scalar elimination chain.
 \item \texttt{Code/test/run\_tests.sh}: shell entry point for the tests.
 \end{itemize}
 
 \section{Current limitation}
-The largest remaining gap is the full constraint reduction of the minimal scalar sector from the covariant quadratic action, and likewise the earlier elimination steps for the nonminimal scalar sector. The present project fully checks the published final mode equations from the published reduced sector actions, but it does not yet reconstruct every intermediate algebraic step that the paper likely performed with \texttt{xTensor}.
+The largest remaining gap is not the covariant-to-scalar derivation itself, but the simplification of the final minimally coupled scalar equations into the compact coefficient basis displayed in eq.~(3.18) of the paper. The project now reconstructs the intermediate constraint elimination from the covariant quadratic action for the minimally coupled scalar sector, but it does not yet rewrite the final two-field equations into the closed forms $(K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0)$. The nonminimal scalar-sector derivation from the covariant action also remains to be automated at the same level.
 
 \end{document}
