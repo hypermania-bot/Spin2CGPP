@@ -11,3 +11,9 @@
 - Solution: documented the convention clearly in the notes and encoded the check in that same convention so the symbolic verification remains precise and reproducible.
 - Avoid in future: for complex Fourier modes with off-diagonal derivative couplings, decide the conjugation and integration-by-parts convention before writing regression tests.
 - Commit ID: `535d51e`
+
+## 2026-04-30
+- Problem encountered: a naive Hessian analysis of the covariant minimal scalar reduction incorrectly suggested that the scalar field `A` remained dynamical after eliminating `E,F`.
+- Solution: switched to the correct sequential constraint chain `F_\pm -> A_\pm -> E_\pm`, implemented it in `Code/script/derive_scalar_mode_eoms.wls`, and added a regression test that confirms the final coupled `(B,\hat{\varphi}_v)` system has a rank-2 acceleration matrix.
+- Avoid in future: for constrained spin-2 scalar systems, do not infer the propagating content from a partially reduced Hessian alone; first eliminate the multiplier equations in the order implied by the constraints.
+- Commit ID: `2743131`
