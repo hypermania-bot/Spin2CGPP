@@ -10,6 +10,6 @@ Reproduce and check the mode equations in Siyang Ling et al., "Cosmological grav
 - `Notes/`: detailed derivation notes prepared for Overleaf upload.
 
 ## Next Steps
-1. Simplify the final coupled scalar equations from `Code/script/derive_scalar_mode_eoms.wls` into the paper's published `{K_\varphi,K_B,L_2,L_1,L_0,\dots}` coefficient basis.
-2. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` to understand why naive Hessian-based elimination looks misleading even though the sequential `F -> A -> E` chain produces the expected two-field system.
-3. Update the notes with the successful sequential elimination chain and add a comparison against the closed-form equations in the paper.
+1. Reconstruct the minimally coupled scalar reduced-action basis itself, not just the final equation basis, so the full `{K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0}` match can be checked directly.
+2. Extend `Code/script/paper_scalar_coeffs.wl` from the verified kinetic subset `{K_\varphi,K_B,L_2,L_1,\kappa,K_\mathcal{B}}` to the remaining mass-sector coefficients `{M_\varphi,M_B,L_0}`.
+3. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` to understand why naive Hessian-based elimination looks misleading even though the sequential `F -> A -> E` chain produces the expected two-field system.
