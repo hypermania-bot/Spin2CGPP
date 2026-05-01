@@ -35,3 +35,9 @@
 - Solution: rewrote the diagnostic to subtract the boundary term `d(a^3 H D^2)/d eta`, verify the reduced sector Lagrangian, verify the tensor mode Euler equation, and add the script to the regression suite.
 - Avoid in future: covariant-to-sector checks should compare actions only after accounting for integrations by parts, and every diagnostic script that claims a check should return a nonzero exit code on failure.
 - Commit ID: `859a5a5`
+
+## 2026-05-01
+- Problem encountered: the minimal scalar EOM note only summarized the covariant reduction and did not preserve the intermediate symbolic record needed to audit the derivation without re-running Mathematica.
+- Solution: expanded `Notes/eom_notes.tex` with the scalar Fourier ansatz, background replacement rules, common denominator, reduced action basis, full coefficient polynomials, derived `\kappa` and `K_\mathcal{B}` combinations, symbolic residual identities, and a numerical spot check; synced and pushed the same note to Overleaf as commit `e6a9e62`.
+- Avoid in future: when a long symbolic derivation is verified by scripts, record the compact definitions and polynomial coefficient basis in the note at the same time as the automated check.
+- Commit ID: `70ad14b`
