@@ -29,3 +29,9 @@
 - Solution: added `Code/script/derive_scalar_reduced_action.wls`, which first integrates derivatives off `E_\pm,F_\pm`, solves them algebraically, verifies the `A_+'A_-'` coefficient cancels, integrates derivatives off `A_\pm`, and then extracts the paper's coefficient basis. Extended `paper_scalar_coeffs.wl` to include `M_\varphi`, `M_B`, and `L_0`. The new full check proves zero symbolic residuals for `K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0`.
 - Avoid in future: for auxiliary fields that appear through first derivatives, integrate by parts to make the auxiliary variables algebraic before substituting their constraints back into the action.
 - Commit ID: `6fa5489`
+
+## 2026-05-01
+- Problem encountered: `Code/script/check_covariant_tensor_sector.wls` compared the covariant tensor reduction to the sector Lagrangian as a raw expression, so it printed a nonzero difference caused by an explicit boundary term and did not fail on the mismatch.
+- Solution: rewrote the diagnostic to subtract the boundary term `d(a^3 H D^2)/d eta`, verify the reduced sector Lagrangian, verify the tensor mode Euler equation, and add the script to the regression suite.
+- Avoid in future: covariant-to-sector checks should compare actions only after accounting for integrations by parts, and every diagnostic script that claims a check should return a nonzero exit code on failure.
+- Commit ID: `859a5a5`
