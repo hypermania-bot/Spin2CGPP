@@ -17,3 +17,9 @@
 - Solution: switched to the correct sequential constraint chain `F_\pm -> A_\pm -> E_\pm`, implemented it in `Code/script/derive_scalar_mode_eoms.wls`, and added a regression test that confirms the final coupled `(B,\hat{\varphi}_v)` system has a rank-2 acceleration matrix.
 - Avoid in future: for constrained spin-2 scalar systems, do not infer the propagating content from a partially reduced Hessian alone; first eliminate the multiplier equations in the order implied by the constraints.
 - Commit ID: `2743131`
+
+## 2026-05-01
+- Problem encountered: the sequentially eliminated scalar equations were too large to compare directly to the paper's coefficient basis, and an initial helper put the published formulas into a private Mathematica package context, which made the numeric substitutions silently unreliable.
+- Solution: added `Code/script/paper_scalar_coeffs.wl` with the published kinetic-sector formulas in the project `Global`` context, added `Code/script/check_scalar_paper_kinetics.wls` and `Code/test/test_scalar_paper_kinetics.wls`, and verified that the diagonal acceleration coefficients from the covariant scalar chain match the paper's `K_\varphi` and `K_B` after normalization. The same script also shows that lifting the acceleration matrix into the paper basis does not yet remove the first-derivative mismatch, which identifies the remaining gap as a reduced-action basis issue rather than a missing simplification.
+- Avoid in future: when moving published formulas into a Mathematica package, bind explicitly to the intended symbol context before trusting any numeric regression output, and separate "equation basis" checks from "reduced-action basis" checks for constrained systems.
+- Commit ID: `ac18f35`
