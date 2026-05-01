@@ -95,7 +95,24 @@ lagReduced = Expand[lagReduced /. {
     Derivative[1][Derivative[1][a][eta]] :> Derivative[2][a][eta]
   }] //. backgroundRules;
 
-expected = a[eta]^2 TT'[eta]^2 - a[eta]^2 (k^2 + a[eta]^2 m^2) TT[eta]^2;
+ClearAll[eulerEquation, simplifyBackground];
+simplifyBackground[expr_] := FullSimplify[Expand[expr] //. backgroundRules];
+eulerEquation[lag_, q_] := simplifyBackground[D[D[lag, q'[eta]], eta] - D[lag, q[eta]]];
 
-Print["lagReduced = ", lagReduced];
-Print["difference = ", FullSimplify[Expand[lagReduced - expected]]];
+boundaryTerm = simplifyBackground[D[a[eta]^3 H[eta] TT[eta]^2, eta]];
+sectorLagrangian = 1/2 a[eta]^2 TT'[eta]^2 - 1/2 a[eta]^2 (k^2 + a[eta]^2 m^2) TT[eta]^2;
+sectorDifference = simplifyBackground[lagReduced - boundaryTerm - sectorLagrangian];
+
+modeEquation = eulerEquation[sectorLagrangian, TT];
+expectedModeEquation = simplifyBackground[
+  a[eta]^2 (TT''[eta] + 2 a[eta] H[eta] TT'[eta] + (k^2 + a[eta]^2 m^2) TT[eta])
+];
+modeEquationDifference = simplifyBackground[modeEquation - expectedModeEquation];
+
+Print["sector difference after boundary term: ", sectorDifference];
+Print["mode equation difference: ", modeEquationDifference];
+
+If[! TrueQ[sectorDifference === 0] || ! TrueQ[modeEquationDifference === 0],
+  Exit[1],
+  Exit[0]
+];

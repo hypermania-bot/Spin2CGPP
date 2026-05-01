@@ -23,6 +23,11 @@ These notes document a reproducible check of the mode equations in Siyang Ling, 
 
 The scripts in \texttt{Code/script/} start from the published quadratic sector Lagrangians and reproduce the final mode equations by explicit Euler-Lagrange variation, including the canonical field redefinitions used in the paper.
 
+\section{End-to-end status}
+The automated checks now operate at two levels. First, \texttt{Code/script/derive\_eoms.wls} verifies the published sector Lagrangians against the quoted mode equations for the minimal tensor, vector, and canonical scalar systems and for the nonminimal tensor, vector, and scalar systems. Second, the covariant-action checks go behind the published reduced Lagrangians where this has been implemented. The minimal tensor diagnostic \texttt{Code/script/check\_covariant\_tensor\_sector.wls} reduces the covariant Fierz--Pauli action to the tensor sector up to an explicit boundary term and verifies the corresponding mode equation. The minimal scalar scripts reduce the covariant scalar action through the constraint chain and match the paper's reduced coefficient basis.
+
+With the current scripts, the original end-to-end goal is reached for the minimally coupled scalar sector, which was the nontrivial coupled system, and for the minimally coupled tensor sector. The vector checks and the nonminimal tensor/vector/scalar checks reproduce the mode equations from the published reduced sector Lagrangians. The remaining open extension is to automate the nonminimal scalar reduction directly from its covariant action.
+
 \section{What the automation does}
 The derivation pipeline is organized around a single repeated pattern. If a sector Lagrangian has the form
 \begin{equation}
@@ -76,6 +81,16 @@ gives
 \omega_k^2 = k^2 + a^2 m^2 - 2a^2 H^2 - aH',
 \end{equation}
 which matches eq.~(3.8) of the paper.
+
+The script \texttt{Code/script/check\_covariant\_tensor\_sector.wls} performs the same check one step earlier, starting from the covariant lower-index tensor field. The reduced covariant expression differs from the sector Lagrangian by the total derivative
+\begin{equation}
+\frac{d}{d\eta}\left(a^3 H D^2\right),
+\end{equation}
+and the script verifies that the sector difference after removing this boundary term is zero. It also verifies the Euler--Lagrange equation
+\begin{equation}
+D'' + 2aH D' + (k^2+a^2m^2)D = 0,
+\end{equation}
+which is equivalent to the canonical equation above after $\chi=aD$.
 
 \subsection{Vector sector}
 The reduced Fourier-space Lagrangian quoted in the paper is
@@ -164,6 +179,7 @@ which are eqs.~(3.66) and (3.73).
 \begin{itemize}[leftmargin=1.5em]
 \item \texttt{Code/script/Spin2CGPP.wl}: derivation helpers and symbolic checks.
 \item \texttt{Code/script/derive\_eoms.wls}: human-readable driver that prints each check.
+\item \texttt{Code/script/check\_covariant\_tensor\_sector.wls}: covariant minimal tensor-sector reduction, boundary-term check, and tensor mode equation check.
 \item \texttt{Code/script/derive\_scalar\_mode\_eoms.wls}: covariant-to-scalar sequential elimination chain for the minimally coupled scalar sector.
 \item \texttt{Code/script/derive\_scalar\_reduced\_action.wls}: action-level scalar reduction and extraction of the paper coefficient basis.
 \item \texttt{Code/script/check\_scalar\_paper\_coeffs.wls}: diagnostic driver that prints the full coefficient comparison.
@@ -175,6 +191,6 @@ which are eqs.~(3.66) and (3.73).
 \end{itemize}
 
 \section{Current limitation}
-The minimally coupled scalar-sector derivation is now automated from the covariant quadratic action through the paper's reduced-action coefficient basis. The remaining limitation is separate: the nonminimal scalar-sector derivation from the covariant action has not yet been automated at the same level.
+The minimally coupled scalar-sector derivation is now automated from the covariant quadratic action through the paper's reduced-action coefficient basis and the coupled mode-equation structure. The remaining limitation is separate: the nonminimal scalar-sector derivation from the covariant action has not yet been automated at the same level.
 
 \end{document}

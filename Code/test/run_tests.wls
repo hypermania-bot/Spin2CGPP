@@ -12,6 +12,18 @@ results = {
     TestID -> "minimal-tensor"
   ],
   VerificationTest[
+    RunProcess[
+      {
+        "wolframscript",
+        "-file",
+        FileNameJoin[{DirectoryName[DirectoryName[$InputFileName]], "script", "check_covariant_tensor_sector.wls"}]
+      },
+      "ExitCode"
+    ],
+    0,
+    TestID -> "minimal-tensor-covariant-sector"
+  ],
+  VerificationTest[
     And @@ (zeroQ /@ Values[Spin2CGPP`CheckMinimalVector[\[Eta]]]),
     True,
     TestID -> "minimal-vector"

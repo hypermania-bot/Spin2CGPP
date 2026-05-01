@@ -10,6 +10,7 @@ Reproduce and check the mode equations in Siyang Ling et al., "Cosmological grav
 - `Notes/`: detailed derivation notes prepared for Overleaf upload.
 
 ## Next Steps
-1. Keep the minimally coupled scalar coefficient check in `Code/script/derive_scalar_reduced_action.wls` as the canonical reduced-action path; the full `{K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0}` match is now checked symbolically.
-2. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` only as historical diagnostics for the misleading partially reduced Hessian route.
-3. Automate the nonminimal scalar-sector derivation from the covariant action at the same level as the minimal scalar-sector derivation.
+1. Treat `Code/script/derive_scalar_reduced_action.wls` as the canonical minimal-scalar reduced-action path; the full `{K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0}` match is checked symbolically.
+2. Treat `Code/script/check_covariant_tensor_sector.wls` as the covariant minimal-tensor check; it removes the explicit boundary term and verifies the tensor mode equation.
+3. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` only as historical diagnostics for the misleading partially reduced Hessian route.
+4. Automate the nonminimal scalar-sector derivation from the covariant action at the same level as the minimal scalar-sector derivation.
