@@ -10,6 +10,6 @@ Reproduce and check the mode equations in Siyang Ling et al., "Cosmological grav
 - `Notes/`: detailed derivation notes prepared for Overleaf upload.
 
 ## Next Steps
-1. Reconstruct the minimally coupled scalar reduced-action basis itself, not just the final equation basis, so the full `{K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0}` match can be checked directly.
-2. Extend `Code/script/paper_scalar_coeffs.wl` from the verified kinetic subset `{K_\varphi,K_B,L_2,L_1,\kappa,K_\mathcal{B}}` to the remaining mass-sector coefficients `{M_\varphi,M_B,L_0}`.
-3. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` to understand why naive Hessian-based elimination looks misleading even though the sequential `F -> A -> E` chain produces the expected two-field system.
+1. Keep the minimally coupled scalar coefficient check in `Code/script/derive_scalar_reduced_action.wls` as the canonical reduced-action path; the full `{K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0}` match is now checked symbolically.
+2. Use `Code/script/check_ds_scalar_limit.wls` and `Code/script/direct_metric_scalar_real.wls` only as historical diagnostics for the misleading partially reduced Hessian route.
+3. Automate the nonminimal scalar-sector derivation from the covariant action at the same level as the minimal scalar-sector derivation.

@@ -5,6 +5,8 @@
 \usepackage{physics}
 \usepackage{enumitem}
 
+\newcommand{\Mpl}{M_{\mathrm{pl}}}
+
 \title{Checking the Mode Equations in\\ \textit{Cosmological gravitational particle production of massive spin-2 particles}}
 \author{Project notes for \texttt{Spin2CGPP}}
 \date{\today}
@@ -113,7 +115,7 @@ and then eliminate the constrained variables in the order
 F_\pm \longrightarrow A_\pm \longrightarrow E_\pm.
 \end{equation}
 
-This ordering is important. A naive Hessian analysis of the partially reduced Lagrangian suggests that $A$ remains dynamical, but that conclusion is misleading. After solving the $F_\pm$ constraints, the $E_\pm$ equations solve $A_\pm$ without introducing $A_\pm''$; after substituting those solutions, the $A_\pm$ equations solve $E_\pm$. Only after this full sequential elimination does the expected coupled two-field system in $(B,\hat\varphi_v)$ emerge.
+This ordering is useful for checking the equations, but the reduced action requires a slightly different bookkeeping step. The fields $E_\pm$ and $F_\pm$ do not carry quadratic kinetic terms, but the cleaned covariant Lagrangian still contains their first derivatives. Therefore \texttt{derive\_scalar\_reduced\_action.wls} first integrates those derivatives by parts, making $E_\pm$ and $F_\pm$ algebraic, and only then solves their constraint equations. After this action-level elimination the apparent $A_+'A_-'$ coefficient cancels exactly. Integrating the remaining $A_\pm'$ terms by parts makes $A_\pm$ algebraic, so it can also be eliminated at the level of the reduced action.
 
 The resulting equations of motion are denoted \texttt{finalB} and \texttt{finalP} in \texttt{derive\_scalar\_mode\_eoms.wls}. The test script verifies three structural facts directly:
 \begin{enumerate}[leftmargin=1.5em]
@@ -122,9 +124,13 @@ The resulting equations of motion are denoted \texttt{finalB} and \texttt{finalP
 \item the derivation starts from the covariant action rather than the published reduced scalar action.
 \end{enumerate}
 
-The current project now includes an explicit Mathematica transcription of the published kinetic-sector coefficients $K_\varphi$, $K_B$, $L_2$, $L_1$, together with the derived combinations $\kappa$ and $K_\mathcal{B}$, in \texttt{Code/script/paper\_scalar\_coeffs.wl}. The regression check \texttt{Code/test/test\_scalar\_paper\_kinetics.wls} verifies that the diagonal acceleration coefficients extracted from the covariant scalar chain match the paper's $K_\varphi$ and $K_B$ formulas after equation normalization, and that the resulting acceleration matrix can be lifted into the paper's kinetic matrix.
+The current project now includes an explicit Mathematica transcription of the full published scalar coefficient set $K_\varphi$, $M_\varphi$, $K_B$, $M_B$, $L_2$, $L_1$, and $L_0$, together with the derived combinations $\kappa$ and $K_\mathcal{B}$, in \texttt{Code/script/paper\_scalar\_coeffs.wl}. The script \texttt{Code/script/derive\_scalar\_reduced\_action.wls} extracts the same coefficients from the covariant reduced action. It uses the paper's integration-by-parts convention: diagonal one-derivative terms such as $\hat\varphi_v'\hat\varphi_v^\ast$ and $B'B^\ast$ are moved into $M_\varphi$ and $M_B$, while the mixed term $\hat\varphi_v'B^\ast$ is moved into $L_1$ and $L_0$.
 
-What remains unsolved is the full reduced-action matching problem rather than the existence of the scalar equations themselves. The sequentially eliminated equations are not yet in the same reduced-action basis as the paper: after lifting the acceleration matrix into the published $(K_\varphi,L_2;L_2,K_B)$ basis, the first-derivative matrix still shows a nonzero residual. So the remaining task is to reconstruct the correct reduced-action basis and then compare the full coefficient set $(K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0)$ term by term.
+The regression check \texttt{Code/test/test\_scalar\_paper\_coeffs.wls} verifies that the residuals for
+\begin{equation}
+K_\varphi,\quad M_\varphi,\quad K_B,\quad M_B,\quad L_2,\quad L_1,\quad L_0
+\end{equation}
+vanish symbolically. It also checks both Fourier orientations for the mixed coefficients.
 
 \section{Nonminimal matter coupling}
 \subsection{Tensor sector}
@@ -159,13 +165,16 @@ which are eqs.~(3.66) and (3.73).
 \item \texttt{Code/script/Spin2CGPP.wl}: derivation helpers and symbolic checks.
 \item \texttt{Code/script/derive\_eoms.wls}: human-readable driver that prints each check.
 \item \texttt{Code/script/derive\_scalar\_mode\_eoms.wls}: covariant-to-scalar sequential elimination chain for the minimally coupled scalar sector.
+\item \texttt{Code/script/derive\_scalar\_reduced\_action.wls}: action-level scalar reduction and extraction of the paper coefficient basis.
+\item \texttt{Code/script/check\_scalar\_paper\_coeffs.wls}: diagnostic driver that prints the full coefficient comparison.
 \item \texttt{Code/script/check\_ds\_scalar\_limit.wls}: de Sitter-limit diagnostic for the pure spin-2 scalar reduction.
 \item \texttt{Code/test/run\_tests.wls}: Mathematica regression tests.
 \item \texttt{Code/test/test\_scalar\_mode\_chain.wls}: regression test for the covariant scalar elimination chain.
+\item \texttt{Code/test/test\_scalar\_paper\_coeffs.wls}: regression test for the full scalar coefficient match.
 \item \texttt{Code/test/run\_tests.sh}: shell entry point for the tests.
 \end{itemize}
 
 \section{Current limitation}
-The largest remaining gap is no longer the covariant-to-scalar derivation itself, nor the diagonal kinetic coefficients. Those pieces are now automated and checked. The remaining gap is the full reduced-action matching of the minimally coupled scalar sector: the current sequentially eliminated equations still need to be converted into the same reduced-action basis used for eq.~(3.18), so that the complete coefficient set $(K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0)$ can be compared term by term. The nonminimal scalar-sector derivation from the covariant action also remains to be automated at the same level.
+The minimally coupled scalar-sector derivation is now automated from the covariant quadratic action through the paper's reduced-action coefficient basis. The remaining limitation is separate: the nonminimal scalar-sector derivation from the covariant action has not yet been automated at the same level.
 
 \end{document}

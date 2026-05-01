@@ -59,6 +59,18 @@ results = {
     ],
     0,
     TestID -> "minimal-scalar-paper-kinetics"
+  ],
+  VerificationTest[
+    RunProcess[
+      {
+        "wolframscript",
+        "-file",
+        FileNameJoin[{DirectoryName[$InputFileName], "test_scalar_paper_coeffs.wls"}]
+      },
+      "ExitCode"
+    ],
+    0,
+    TestID -> "minimal-scalar-paper-coefficients"
   ]
 };
 
