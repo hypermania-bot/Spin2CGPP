@@ -147,6 +147,224 @@ K_\varphi,\quad M_\varphi,\quad K_B,\quad M_B,\quad L_2,\quad L_1,\quad L_0
 \end{equation}
 vanish symbolically. It also checks both Fourier orientations for the mixed coefficients.
 
+\subsubsection{Scalar-sector symbolic record}
+This subsection records the explicit intermediate expressions used by the Mathematica derivation of the minimally coupled scalar equations. The scalar ansatz is evaluated for a pair of complex Fourier modes $u=e^{ikz}$ and $u^{-1}=e^{-ikz}$:
+\begin{align}
+v_{00} &= a^2 (E_+u+E_-u^{-1}), &
+v_{03} &= a^2 \partial_z(F_+u+F_-u^{-1}), \\
+v_{11} &= a^2 (A_+u+A_-u^{-1}), &
+v_{22} &= a^2 (A_+u+A_-u^{-1}), \\
+v_{33} &= a^2 \left[A_+u+A_-u^{-1}+\partial_z^2(B_+u+B_-u^{-1})\right], &
+\varphi_v &= \varphi_+u+\varphi_-u^{-1}.
+\end{align}
+The field redefinition used before solving constraints is
+\begin{equation}
+\varphi_\pm = \hat\varphi_\pm + \frac{\bar\phi'}{\Mpl aH} A_\pm .
+\end{equation}
+After the redefinition, every expression is reduced with
+\begin{align}
+a' &= a^2H, &
+a'' &= 2a^3H^2+a^2H', &
+H' &= -\frac{\bar\phi'^2}{2a\Mpl^2}, \\
+\bar\phi'' &= -2aH\bar\phi' - a^2V_{,\phi}, &
+V_{,\phi}' &= V_{,\phi\phi}\bar\phi'.
+\end{align}
+The compact mass combination and common scalar denominator are
+\begin{align}
+m_H^2 &\equiv 2H^2-\frac{\bar\phi'^2}{a^2\Mpl^2}, \\
+\Delta &\equiv H^2k^4
+3a^2(m^2-m_H^2)H^2k^2
+\frac{3}{8}a^4m^2\left(6m^2H^2-4H^2m_H^2-m_H^4\right).
+\end{align}
+
+At the action level, the first-derivative terms in $E_\pm$ and $F_\pm$ are integrated by parts before imposing their algebraic equations. This gives the diagnostic result
+\begin{equation}
+\frac{\partial^2\mathcal L}{\partial A_+'\partial A_-'}\bigg|_{E,F\ \mathrm{eliminated}} = 0,
+\end{equation}
+so $A_\pm$ can also be made algebraic by integration by parts. Eliminating $A_\pm$ produces the reduced scalar action
+\begin{align}
+\mathcal L_{S,\mathrm{red}}={}&
+2K_\varphi\,\hat\varphi_+'\hat\varphi_-'
+-2M_\varphi\,\hat\varphi_+\hat\varphi_-
+2K_B\,B_+'B_-'
+-2M_B\,B_+B_- \nonumber \\
+&+L_2\left(\hat\varphi_+'B_-'+\hat\varphi_-'B_+'\right)
++L_1\left(\hat\varphi_+B_-'+\hat\varphi_-B_+'\right)
+-L_0\left(\hat\varphi_+B_-+\hat\varphi_-B_+\right),
+\end{align}
+up to total derivatives and the same overall Fourier normalization used in the scripts. The extracted coefficients are
+\begin{align}
+K_\varphi &=
+\frac{a^2}{2\Delta}
+\left[
+H^2k^4+3a^2(m^2-m_H^2)H^2k^2
+\frac94 a^4m^2(m^2-m_H^2)H^2
+\right], \\
+K_B &=
+\frac{a^6m^2k^4}{8\Delta}
+\left(8m^2H^2-6H^2m_H^2-m^2m_H^2\right), \\
+L_2 &=
+\frac{a^3m^2\bar\phi'}{2\Mpl H\,\Delta}
+\left[
+H^2k^4+\frac32 a^2(m^2-m_H^2)H^2k^2
+\right], \\
+L_1 &=
+-\frac{a^4m^2\bar\phi'}{\Mpl\,\Delta}
+\left[
+\left(H^2-\frac14m_H^2-\frac{aHV_{,\phi}}{2\bar\phi'}\right)k^4
+-\frac32a^2(m^2-m_H^2)
+\left(H^2+\frac14m_H^2+\frac{aHV_{,\phi}}{2\bar\phi'}\right)k^2
+\right], \\
+L_0 &=
+\frac{a^3m^2\bar\phi'}{2\Mpl H\,\Delta^2}
+\left(c_{10}^{(L)}k^{10}+c_8^{(L)}k^8+c_6^{(L)}k^6+c_4^{(L)}k^4+c_2^{(L)}k^2\right), \\
+M_\varphi &=
+\frac{a^2}{2\Delta^2}
+\left(c_{10}^{(\varphi)}k^{10}+c_8^{(\varphi)}k^8+c_6^{(\varphi)}k^6
++c_4^{(\varphi)}k^4+c_2^{(\varphi)}k^2+c_0^{(\varphi)}\right), \\
+M_B &=
+\frac{a^6m^2}{8\Delta^2}
+\left(c_{10}^{(B)}k^{10}+c_8^{(B)}k^8+c_6^{(B)}k^6+c_4^{(B)}k^4\right).
+\end{align}
+The two derived combinations used in the subsequent canonical scalar variables are
+\begin{equation}
+\kappa=-\frac{L_2}{2k^2K_\varphi},
+\qquad
+K_{\mathcal B}=\frac{4K_\varphi K_B-L_2^2}{4k^4K_\varphi}.
+\end{equation}
+The polynomial coefficients in these expressions are
+\begin{align}
+c_{10}^{(\varphi)} &= H^4, \\
+c_8^{(\varphi)} &=
+\frac12a^2H^2\left(
+12m^2H^2+8H^4-14H^2m_H^2-m_H^4
++\frac{4HV_{,\phi}\bar\phi'}{a\Mpl^2}+2H^2V_{,\phi\phi}
+\right), \\
+c_6^{(\varphi)} &=
+\frac38a^4H^2\bigg[
+36m^4H^2+72m^2H^4-82m^2H^2m_H^2-64H^4m_H^2
+-7m^2m_H^4+40H^2m_H^4+8m_H^6 \nonumber\\
+&\hspace{7em}
++\frac{8(3m^2-4m_H^2)HV_{,\phi}\bar\phi'}{a\Mpl^2}
++16(m^2-m_H^2)H^2V_{,\phi\phi}
+\bigg], \\
+c_4^{(\varphi)} &=
+\frac38a^6\bigg[
+4H^2\left(
+9m^6H^2+36m^4H^4+16m^2H^6-30m^4H^2m_H^2-76m^2H^4m_H^2 \right. \nonumber\\
+&\hspace{8em}\left.
+-3m^4m_H^4+31m^2H^2m_H^4+24H^4m_H^4+6m^2m_H^6-6H^2m_H^6-3m_H^8
+\right) \nonumber\\
+&\hspace{7em}
+-\frac{4m^2H^2(H^2-m_H^2)V_{,\phi}^2}{\Mpl^2} \nonumber\\
+&\hspace{7em}
++\left(36m^4H^2+8m^2H^4-94m^2H^2m_H^2+m^2m_H^4+48H^2m_H^4\right)
+\frac{HV_{,\phi}\bar\phi'}{a\Mpl^2} \nonumber\\
+&\hspace{7em}
++\left(36m^4H^2-58m^2H^2m_H^2-m^2m_H^4+24H^2m_H^4\right)H^2V_{,\phi\phi}
+\bigg], \\
+c_2^{(\varphi)} &=
+\frac{9}{32}a^8m^2\bigg[
+H^2\left(
+18m^6H^2+120m^4H^4+128m^2H^6-78m^4H^2m_H^2-384m^2H^4m_H^2 \right. \nonumber\\
+&\hspace{8em}\left.
+-9m^4m_H^4+132m^2H^2m_H^4+128H^4m_H^4+23m^2m_H^6-32H^2m_H^6-16m_H^8
+\right) \nonumber\\
+&\hspace{7em}
+-\frac{8H^2(2m^2H^2-2m^2m_H^2+m_H^4)V_{,\phi}^2}{\Mpl^2} \nonumber\\
+&\hspace{7em}
++4\left(6m^4H^2-22m^2H^2m_H^2+m^2m_H^4+14H^2m_H^4\right)
+\frac{HV_{,\phi}\bar\phi'}{a\Mpl^2} \nonumber\\
+&\hspace{7em}
++4(m^2-m_H^2)(12m^2H^2-10H^2m_H^2-m_H^4)H^2V_{,\phi\phi}
+\bigg], \\
+c_0^{(\varphi)} &=
+\frac{27}{32}a^{10}m^4\bigg[
+-\frac{2H^2(2m^2H^2-2m^2m_H^2+m_H^4)V_{,\phi}^2}{\Mpl^2}
+-\frac{m^2(2H^2-m_H^2)(4H^2+m_H^2)HV_{,\phi}\bar\phi'}{a\Mpl^2} \nonumber\\
+&\hspace{7em}
++(m^2-m_H^2)(6m^2H^2-4H^2m_H^2-m_H^4)H^2V_{,\phi\phi}
+\bigg].
+\end{align}
+\begin{align}
+c_{10}^{(B)} &= H^2(8m^2H^2-8H^4-2H^2m_H^2-m^2m_H^2), \\
+c_8^{(B)} &=
+a^2H^2\left[
+30m^4H^2+32m^2H^4-96H^6-3m^4m_H^2-56m^2H^2m_H^2+48H^4m_H^2 \right. \nonumber\\
+&\hspace{8em}\left.
++5m^2m_H^4+6H^2m_H^4
++(4m^2-24H^2)\frac{HV_{,\phi}\bar\phi'}{a\Mpl^2}
+\right], \\
+c_6^{(B)} &=
+\frac38a^4m^2\left[
+96m^4H^4+144m^2H^6-6m^4H^2m_H^2-252m^2H^4m_H^2-192H^6m_H^2 \right. \nonumber\\
+&\hspace{8em}\left.
++8m^2H^2m_H^4+200H^4m_H^4-10H^2m_H^6-m^2m_H^6
++(8m^2m_H^2-16H^2m_H^2)\frac{HV_{,\phi}\bar\phi'}{a\Mpl^2}
+\right], \\
+c_4^{(B)} &=
+\frac38a^6m^4\left[
+36m^4H^4-48m^2H^6+64H^8-12m^2H^4m_H^2-32H^6m_H^2
+-12m^2H^2m_H^4 \right. \nonumber\\
+&\hspace{8em}\left.
++4H^4m_H^4+12H^2m_H^6-3m^2m_H^6+2m_H^8 \right. \nonumber\\
+&\hspace{8em}\left.
+-(24m^2H^2-16H^4-12m^2m_H^2-8H^2m_H^2+8m_H^4)
+\frac{HV_{,\phi}\bar\phi'}{a\Mpl^2}
+\right].
+\end{align}
+\begin{align}
+c_{10}^{(L)} &= H^4, \\
+c_8^{(L)} &=
+\frac12a^2H^4\left(9m^2+12H^2-13m_H^2-\frac{4aHV_{,\phi}}{\bar\phi'}\right), \\
+c_6^{(L)} &=
+\frac38a^4H^2\left[
+18m^4H^2+32m^2H^4+64H^6-48m^2H^2m_H^2-64H^4m_H^2
++m^2m_H^4+28H^2m_H^4 \right. \nonumber\\
+&\hspace{8em}\left.
++8(-4m^2H^2+4H^4+m^2m_H^2)\frac{aHV_{,\phi}}{\bar\phi'}
+\right], \\
+c_4^{(L)} &=
+\frac{3}{16}a^6m^2H^2\left[
+18m^4H^2-24m^2H^4+256H^6-54m^2H^2m_H^2-160H^4m_H^2 \right. \nonumber\\
+&\hspace{8em}\left.
++9m^2m_H^4+60H^2m_H^4-7m_H^6
++4(-30m^2H^2+32H^4+12m^2m_H^2+4H^2m_H^2-7m_H^4)
+\frac{aHV_{,\phi}}{\bar\phi'}
+\right], \\
+c_2^{(L)} &=
+\frac{9}{16}a^8m^4H^2(2H^2-m_H^2)
+\left[
+-(4H^2+m_H^2)(3m^2-4H^2-m_H^2)
++4(-3m^2+2H^2+2m_H^2)\frac{aHV_{,\phi}}{\bar\phi'}
+\right].
+\end{align}
+
+The symbolic comparison performed in \texttt{check\_scalar\_paper\_coeffs.wls} returns
+\begin{equation}
+\begin{gathered}
+\frac{\partial^2\mathcal L}{\partial A_+'\partial A_-'}=0, \\
+\delta K_\varphi=\delta M_\varphi=\delta K_B=\delta M_B
+=\delta L_2=\delta L_1=\delta L_0=0,
+\end{gathered}
+\end{equation}
+with the same zero residuals in the opposite Fourier orientation. The numerical spot check used by the script,
+\begin{equation}
+a=2,\quad H=\frac{3}{10},\quad \bar\phi'=\frac15,\quad \Mpl=5,\quad
+m=\frac7{10},\quad k=\frac{11}{10},\quad
+V_{,\phi}=\frac{13}{10},\quad V_{,\phi\phi}=\frac{17}{10},
+\end{equation}
+gives
+\begin{align}
+K_\varphi &= 1.9995900442618875, &
+M_\varphi &= 16.623735495848287, &
+K_B &= 0.934701933108572, \\
+M_B &= 3.146452918424948, &
+L_2 &= 0.08485818996827352, &
+L_1 &= 2.2787374727884644, &
+L_0 &= -0.9584455789624143.
+\end{align}
+
 \section{Nonminimal matter coupling}
 \subsection{Tensor sector}
 The tensor-sector action in the nonminimal model is
