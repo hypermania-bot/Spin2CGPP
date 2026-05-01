@@ -23,3 +23,9 @@
 - Solution: added `Code/script/paper_scalar_coeffs.wl` with the published kinetic-sector formulas in the project `Global`` context, added `Code/script/check_scalar_paper_kinetics.wls` and `Code/test/test_scalar_paper_kinetics.wls`, and verified that the diagonal acceleration coefficients from the covariant scalar chain match the paper's `K_\varphi` and `K_B` after normalization. The same script also shows that lifting the acceleration matrix into the paper basis does not yet remove the first-derivative mismatch, which identifies the remaining gap as a reduced-action basis issue rather than a missing simplification.
 - Avoid in future: when moving published formulas into a Mathematica package, bind explicitly to the intended symbol context before trusting any numeric regression output, and separate "equation basis" checks from "reduced-action basis" checks for constrained systems.
 - Commit ID: `ac18f35`
+
+## 2026-05-01
+- Problem encountered: the earlier scalar reduction solved the `E,F` constraints from Euler equations and substituted them into a Lagrangian that still contained `E'` and `F'`, which obscured the reduced-action basis and left false coefficient mismatches.
+- Solution: added `Code/script/derive_scalar_reduced_action.wls`, which first integrates derivatives off `E_\pm,F_\pm`, solves them algebraically, verifies the `A_+'A_-'` coefficient cancels, integrates derivatives off `A_\pm`, and then extracts the paper's coefficient basis. Extended `paper_scalar_coeffs.wl` to include `M_\varphi`, `M_B`, and `L_0`. The new full check proves zero symbolic residuals for `K_\varphi,M_\varphi,K_B,M_B,L_2,L_1,L_0`.
+- Avoid in future: for auxiliary fields that appear through first derivatives, integrate by parts to make the auxiliary variables algebraic before substituting their constraints back into the action.
+- Commit ID: `6fa5489`
