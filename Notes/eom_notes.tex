@@ -24,9 +24,9 @@ These notes document a reproducible check of the mode equations in Siyang Ling, 
 The scripts in \texttt{Code/script/} start from the published quadratic sector Lagrangians and reproduce the final mode equations by explicit Euler-Lagrange variation, including the canonical field redefinitions used in the paper.
 
 \section{End-to-end status}
-The automated checks now operate at two levels. First, \texttt{Code/script/derive\_eoms.wls} verifies the published sector Lagrangians against the quoted mode equations for the minimal tensor, vector, and canonical scalar systems and for the nonminimal tensor, vector, and scalar systems. Second, the covariant-action checks go behind the published reduced Lagrangians where this has been implemented. The minimal tensor diagnostic \texttt{Code/script/check\_covariant\_tensor\_sector.wls} reduces the covariant Fierz--Pauli action to the tensor sector up to an explicit boundary term and verifies the corresponding mode equation. The minimal scalar scripts reduce the covariant scalar action through the constraint chain and match the paper's reduced coefficient basis.
+The automated checks now operate at two levels. First, \texttt{Code/script/derive\_eoms.wls} verifies the published sector Lagrangians against the quoted mode equations for the minimal tensor, vector, and canonical scalar systems and for the nonminimal tensor, vector, and scalar systems. Second, the covariant-action checks go behind the published reduced Lagrangians. The tensor diagnostics reduce the covariant minimal and nonminimal massive actions to the paper's tensor-sector actions up to explicit boundary terms and verify the corresponding mode equations. The scalar scripts reduce the covariant minimal and nonminimal scalar actions through their constraint chains and match the paper's reduced coefficient bases.
 
-With the current scripts, the original end-to-end goal is reached for the minimally coupled scalar sector, which was the nontrivial coupled system, and for the minimally coupled tensor sector. The vector checks and the nonminimal tensor/vector/scalar checks reproduce the mode equations from the published reduced sector Lagrangians. The remaining open extension is to automate the nonminimal scalar reduction directly from its covariant action.
+With the current scripts, the end-to-end goal is reached for the minimally coupled scalar sector and for the nonminimally coupled scalar sector. The vector checks still start from the published reduced sector Lagrangians, while the tensor and scalar checks now include covariant-action reductions.
 
 \section{What the automation does}
 The derivation pipeline is organized around a single repeated pattern. If a sector Lagrangian has the form
@@ -381,6 +381,13 @@ with
 \end{equation}
 matching eq.~(3.58).
 
+The script \texttt{Code/script/check\_covariant\_nonminimal\_tensor\_sector.wls} performs the same check directly from \(\mathcal L_{vv}^{(2)}\) in eq.~(2.40). The Friedmann substitution is
+\begin{equation}
+V(\bar\phi)=\Mpl^2(3H^2-\Lambda)-\frac{\bar\phi'^2}{2a^2},
+\end{equation}
+so that the scalar background Lagrangian contributes
+\(\bar{\mathcal L}=\bar\phi'^2/(2a^2)-V\). After removing \(d(a^3HD^2)/d\eta\), the covariant reduction leaves exactly the tensor-sector action above.
+
 \subsection{Vector and scalar sectors}
 The paper reduces both the vector and scalar sectors to single-field quadratic actions of the same form
 \begin{equation}
@@ -393,13 +400,37 @@ The Mathematica scripts apply the same canonical-normalization identity and repr
 \end{align}
 which are eqs.~(3.66) and (3.73).
 
+For the nonminimal scalar sector, \texttt{Code/script/derive\_nonminimal\_scalar\_reduced\_action.wls} starts from the covariant \(\mathcal L_{vv}^{(2)}\), applies the scalar SVT ansatz for \(A,B,E,F\), integrates first derivatives off \(E_\pm,F_\pm\), solves those algebraic constraints, verifies that the \(A_+'A_-'\) coefficient cancels, and then eliminates \(A_\pm\) algebraically. The final one-field action is
+\begin{equation}
+\mathcal L_{S,k}=2K_B B_+'B_-'-2M_B B_+B_-,
+\end{equation}
+up to the same Fourier normalization convention used in the minimal scalar script. The script verifies the exact symbolic identities
+\begin{equation}
+K_B^{\rm cov}-K_B^{\rm paper}=0,
+\qquad
+M_B^{\rm cov}-M_B^{\rm paper}=0,
+\end{equation}
+with
+\begin{align}
+P={}&4(m^2+3H^2+3\dot H)k^4
++12a^2\left[(m^2+H^2)(m^2+3H^2)+2(m^2+H^2)\dot H-\dot H^2\right]k^2 \nonumber\\
+&+9a^4(m^2+H^2)(m^2+3H^2-\dot H)(m^2+3H^2+2\dot H),\\
+K_B={}&\frac{a^4}{P}\left[
+-4\dot H^2k^6
++3a^2(m^2+H^2)(m^2+3H^2-\dot H)(m^2+3H^2+2\dot H)k^4
+\right],
+\end{align}
+and \(M_B\) equal to the coefficient polynomial printed in eq.~(3.70). Here \(\dot H=H'/a\) and \(\ddot H=H''/a^2-HH'/a\). Applying \(\chi=\sqrt{2K_B}B\) then gives eqs.~(3.72)--(3.73).
+
 \section{Files}
 \begin{itemize}[leftmargin=1.5em]
 \item \texttt{Code/script/Spin2CGPP.wl}: derivation helpers and symbolic checks.
 \item \texttt{Code/script/derive\_eoms.wls}: human-readable driver that prints each check.
 \item \texttt{Code/script/check\_covariant\_tensor\_sector.wls}: covariant minimal tensor-sector reduction, boundary-term check, and tensor mode equation check.
+\item \texttt{Code/script/check\_covariant\_nonminimal\_tensor\_sector.wls}: covariant nonminimal tensor-sector reduction, boundary-term check, and tensor mode equation check.
 \item \texttt{Code/script/derive\_scalar\_mode\_eoms.wls}: covariant-to-scalar sequential elimination chain for the minimally coupled scalar sector.
 \item \texttt{Code/script/derive\_scalar\_reduced\_action.wls}: action-level scalar reduction and extraction of the paper coefficient basis.
+\item \texttt{Code/script/derive\_nonminimal\_scalar\_reduced\_action.wls}: action-level nonminimal scalar reduction from \(\mathcal L_{vv}^{(2)}\) and exact comparison to the paper's \(K_B,M_B\).
 \item \texttt{Code/script/check\_scalar\_paper\_coeffs.wls}: diagnostic driver that prints the full coefficient comparison.
 \item \texttt{Code/script/check\_ds\_scalar\_limit.wls}: de Sitter-limit diagnostic for the pure spin-2 scalar reduction.
 \item \texttt{Code/test/run\_tests.wls}: Mathematica regression tests.
@@ -408,7 +439,7 @@ which are eqs.~(3.66) and (3.73).
 \item \texttt{Code/test/run\_tests.sh}: shell entry point for the tests.
 \end{itemize}
 
-\section{Current limitation}
-The minimally coupled scalar-sector derivation is now automated from the covariant quadratic action through the paper's reduced-action coefficient basis and the coupled mode-equation structure. The remaining limitation is separate: the nonminimal scalar-sector derivation from the covariant action has not yet been automated at the same level.
+\section{Current status}
+The minimally coupled scalar-sector derivation is automated from the covariant quadratic action through the paper's reduced-action coefficient basis and the coupled mode-equation structure. The nonminimally coupled scalar-sector derivation is also automated from the covariant quadratic action through the paper's \(K_B,M_B\) basis and canonical mode equation. The remaining possible extension is to add covariant-action vector-sector reductions; the current vector tests start from the reduced vector Lagrangians quoted in the paper.
 
 \end{document}

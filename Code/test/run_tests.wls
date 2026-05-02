@@ -39,6 +39,18 @@ results = {
     TestID -> "nonminimal-tensor"
   ],
   VerificationTest[
+    RunProcess[
+      {
+        "wolframscript",
+        "-file",
+        FileNameJoin[{DirectoryName[DirectoryName[$InputFileName]], "script", "check_covariant_nonminimal_tensor_sector.wls"}]
+      },
+      "ExitCode"
+    ],
+    0,
+    TestID -> "nonminimal-tensor-covariant-sector"
+  ],
+  VerificationTest[
     And @@ (zeroQ /@ Values[Spin2CGPP`CheckNonminimalVector[\[Eta]]]),
     True,
     TestID -> "nonminimal-vector"
@@ -47,6 +59,18 @@ results = {
     And @@ (zeroQ /@ Values[Spin2CGPP`CheckNonminimalScalar[\[Eta]]]),
     True,
     TestID -> "nonminimal-scalar"
+  ],
+  VerificationTest[
+    RunProcess[
+      {
+        "wolframscript",
+        "-file",
+        FileNameJoin[{DirectoryName[$InputFileName], "test_nonminimal_scalar_coeffs.wls"}]
+      },
+      "ExitCode"
+    ],
+    0,
+    TestID -> "nonminimal-scalar-covariant-coefficients"
   ],
   VerificationTest[
     RunProcess[
