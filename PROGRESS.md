@@ -41,3 +41,9 @@
 - Solution: expanded `Notes/eom_notes.tex` with the scalar Fourier ansatz, background replacement rules, common denominator, reduced action basis, full coefficient polynomials, derived `\kappa` and `K_\mathcal{B}` combinations, symbolic residual identities, and a numerical spot check; synced and pushed the same note to Overleaf as commit `e6a9e62`.
 - Avoid in future: when a long symbolic derivation is verified by scripts, record the compact definitions and polynomial coefficient basis in the note at the same time as the automated check.
 - Commit ID: `70ad14b`
+
+## 2026-05-02
+- Problem encountered: the first nonminimal scalar coefficient check showed false `K_B` and `M_B` mismatches because top-level Mathematica assignments used leading `+` continuation lines; WolframScript evaluated those continuation lines as separate expressions, so the paper-side `P` and coefficient polynomials were silently truncated. A separate tensor diagnostic also initially used the wrong sign in the Friedmann substitution for `V(\bar\phi)`.
+- Solution: rewrote the nonminimal paper coefficient transcription with explicit parenthesized right-hand sides, corrected the Friedmann substitution to `V = Mpl^2 (3 H^2 - Lambda) - phib^2/(2 a^2)`, and added covariant nonminimal tensor and scalar regression scripts. The scalar script now reduces `\mathcal L_{vv}^{(2)}` through the `E,F,A` constraints and verifies exact zero residuals for the paper's `K_B` and `M_B`.
+- Avoid in future: in Wolfram scripts, wrap multi-line assigned expressions in parentheses or put binary operators at the end of the previous line; for background substitutions, derive `V` directly from the Friedmann equation before coding the rule.
+- Commit ID: `18cf5af`
