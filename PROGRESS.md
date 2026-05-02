@@ -1,5 +1,11 @@
 # Progress Log
 
+## 2026-05-02
+- Problem encountered: Numerical integration of CGPP mode equations is extremely challenging due to (a) enormous range of time scales (inflaton oscillation period ~10^5 Planck times vs Hubble time ~10^7), (b) rapidly oscillating mode functions at late times (m/H ≫ 1 in N-time), (c) conservation of the Wronskian is fragile with standard ODE integrators, and (d) the background ODE in N-time breaks down at the potential minimum (V→0 gives H²=0/0).
+- Solutions: (1) Used dlnH/dN = -eps for background evolution, avoiding the zero-mass singularity. (2) Used Hamiltonian variable u = sqrt(aH) * chi which eliminates the friction term in the mode equation, resulting in perfect Wronskian conservation (W=1.000000). (3) Used an adiabatic stopping condition (|dΩ/dN|/Ω² < 0.01, N > N_end + 0.7) to stop integration when n_k has stabilized. (4) Started integration at N_end - 3 for all modes, balancing BD validity with computational efficiency.
+- Avoid in future: Never use the V/(3-eps) formula for H² post-inflation; always evolve H independently. Never integrate mode equations in cosmic time with the friction term; use Hamiltonian variables or N-time + adiabatic stopping. Always check Wronskian conservation as a code-health metric.
+- Commit ID: `0dd61a0` (main pipeline), `302ea72` (initial attempt)
+
 ## 2026-04-29
 - Problem encountered: direct Lagrangian comparisons after canonical field redefinitions produced nonzero residuals because the transformed Lagrangians differ by total derivatives.
 - Solution: changed the Mathematica checks to compare Euler-Lagrange equations and frequency identities instead of raw Lagrangian expressions.
