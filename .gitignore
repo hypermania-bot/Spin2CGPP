@@ -6,3 +6,4 @@ Code/asset/
 *.out
 *.toc
 *.pdf
+__pycache__/
