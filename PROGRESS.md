@@ -1,6 +1,20 @@
 # Progress Log
 
-## 2026-05-02
+## 2026-05-02 (afternoon)
+- Problem: RK45 ODE integrator requires ~500k function evaluations per mode at rtol=1e-9, taking ~30s/mode. DOP853 and LSODA offer similar performance. Relaxing tolerance to rtol=1e-8 gives inaccurate |β|² (negative or wrong by factors of 10-100x at high k).
+- Solution: Implemented exact-step (symplectic) midpoint integrator that evaluates Q² = ω²/(aH)² at each step midpoint and applies the exact harmonic oscillator solution. This gives perfect Wronskian conservation (Wr=1.000000) and runs ~0.5-3s per mode (10-60x faster than RK45). For k ≤ 10 a_e H_e, accuracy is within ~4% of the RK45 reference.
+- Limitation: The fast integrator diverges from RK45 results at high k (k ≫ 10 a_e H_e) where Q varies rapidly. For these modes, the post-inflation analytic continuation may also miss oscillatory particle production features that depend on the full inflaton dynamics.
+- Extended cgpp_numerics.py with new omega² functions: tensor_nonmin, vector_nonmin (via direct finite-difference), scalar_nonmin (KB/MB polynomial + finite-difference derivatives).
+- Implemented new standalone code cgpp_full.py with all sectors and the fast symplectic integrator.
+- Full spectra computed for 4 sectors × 4 masses (m/(√2 H_inf)=2,3,4,5) × 35 k-modes, saved to Code/output/cgpp_full_result.pkl.
+- Key numerical results:
+  - tensor_minimal ≈ vector_minimal ≈ tensor_nonmin: peak n_k ~ 6-8e-3 at k ≈ 25-50 a_e H_e
+  - vector_nonmin: strongly enhanced for m/(√2 H_inf)=2 (peak n_k=1.1, 165x tensor) due to proximity to gradient instability. Enhancement decreases with mass: m=3→0.23, m=4→0.068, m=5→0.065.
+  - Low-k spectra show oscillations in ln(k) from imaginary ν (m > 1.5 H_inf), consistent with paper's Appendix.
+- Avoid in future: For oscillatory ODEs, use symplectic/exact-step methods rather than adaptive RK. Evaluate the frequency at the step midpoint for 2nd-order accuracy. For accurate |β|², the solution phase must be correct (simple Wronskian check is insufficient).
+- Commit ID: `10182b8`
+
+## 2026-05-02 (morning)
 - Problem encountered: Numerical integration of CGPP mode equations is extremely challenging due to (a) enormous range of time scales (inflaton oscillation period ~10^5 Planck times vs Hubble time ~10^7), (b) rapidly oscillating mode functions at late times (m/H ≫ 1 in N-time), (c) conservation of the Wronskian is fragile with standard ODE integrators, and (d) the background ODE in N-time breaks down at the potential minimum (V→0 gives H²=0/0).
 - Solutions: (1) Used dlnH/dN = -eps for background evolution, avoiding the zero-mass singularity. (2) Used Hamiltonian variable u = sqrt(aH) * chi which eliminates the friction term in the mode equation, resulting in perfect Wronskian conservation (W=1.000000). (3) Used an adiabatic stopping condition (|dΩ/dN|/Ω² < 0.01, N > N_end + 0.7) to stop integration when n_k has stabilized. (4) Started integration at N_end - 3 for all modes, balancing BD validity with computational efficiency.
 - Avoid in future: Never use the V/(3-eps) formula for H² post-inflation; always evolve H independently. Never integrate mode equations in cosmic time with the friction term; use Hamiltonian variables or N-time + adiabatic stopping. Always check Wronskian conservation as a code-health metric.
