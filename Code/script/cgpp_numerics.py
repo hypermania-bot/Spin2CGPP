@@ -228,9 +228,122 @@ def _omega2_vector_minimal(k, a, H, eps, m):
     return k2 + a2m2 - fpp_over_f
 
 
+def _omega2_tensor_nonmin(k, a, H, eps, m):
+    """omega_k^2 = k^2 + a^2 m^2 + a^2 H^2 (1 - eps).  Eq. (4.15) with Lambda=0."""
+    return k**2 + a**2 * (m**2 + H**2 * (1.0 - eps))
+
+
+def _omega2_vector_nonmin(k, a, H, eps, m):
+    """
+    Non-minimal vector: omega_k^2 = (4 K_C M_C + K_C'^2 - 2 K_C K_C'')/(4 K_C^2)
+    Evaluated via finite differences of K_C.
+    """
+    def _KC(av, Hv, ev):
+        mu12 = m**2 + Hv**2 * (3.0 + ev)
+        Dv = k**2 + av**2 * mu12
+        if Dv <= 1e-300 or mu12 <= 0:
+            return 1e-200
+        return av**4 * k**2 * mu12 / Dv
+
+    KC0 = _KC(a, H, eps)
+    if KC0 <= 1e-200:
+        return k**2
+
+    dN = 0.001
+    # Use nearby points for finite difference -- need eps values, assume eps varies slowly
+    KCp = _KC(a * np.exp(dN), H * np.exp(-eps * dN), eps)
+    KCm = _KC(a * np.exp(-dN), H * np.exp(eps * dN), eps)
+
+    aH = a * H
+    KCprime = aH * (KCp - KCm) / (2.0 * dN)
+    KCpp = aH**2 * ((KCp - 2.0*KC0 + KCm)/dN**2 + (1.0 - eps)*(KCp - KCm)/(2.0*dN))
+
+    MC0 = a**4 * k**2 * (m**2 + H**2*(3.0 - 2.0*eps))
+
+    num = 4.0*KC0*MC0 + KCprime**2 - 2.0*KC0*KCpp
+    den = 4.0*KC0**2
+    if den <= 1e-200:
+        return k**2
+    return num / den
+
+
+def _omega2_scalar_nonmin(k, a, H, eps, m):
+    """
+    Non-minimal scalar: omega_k^2 = (4 K_B M_B + K_B'^2 - 2 K_B K_B'')/(4 K_B^2)
+    Evaluated via finite differences.
+    Uses the full K_B/M_B polynomial formulas.
+    """
+    dN_fd = 0.001
+    KB0, MB0 = _compute_KB_MB(k, a, H, eps, m)
+    if KB0 <= 1e-200:
+        return k**2
+
+    KBp, _ = _compute_KB_MB(k, a*np.exp(dN_fd), H*np.exp(-eps*dN_fd), eps, m)
+    KBm, _ = _compute_KB_MB(k, a*np.exp(-dN_fd), H*np.exp(eps*dN_fd), eps, m)
+
+    L0 = np.log(KB0)
+    Lp = np.log(max(KBp, 1e-200)); Lm = np.log(max(KBm, 1e-200))
+    L_dN = (Lp - Lm) / (2.0*dN_fd)
+    L_d2N = (Lp - 2.0*L0 + Lm) / dN_fd**2
+
+    a2H2 = a**2 * H**2
+    Omega2 = MB0/(a2H2*KB0) - 0.5*L_d2N - 0.5*(1.0-eps)*L_dN - 0.25*L_dN**2
+    return max(Omega2*a2H2, 1e-200)
+
+
+def _compute_KB_MB(k, a, H, eps, m):
+    """Compute K_B and M_B for non-minimal scalar. See paper Eq. (4.32)-(4.33)."""
+    # dotH = dH/dt = H dH/dN = -H^2 eps  (where d/dN gives d/dt = H d/dN)
+    # ddotH = d^2 H/dt^2 = H^3(2 eps^2)  (approximation, ignoring eps')
+    dotH = -H**2 * eps
+    ddotH = H**3 * 2.0 * eps**2  # approximation
+
+    a2, a4, a6 = a**2, a**4, a**6
+    k2, k4, k6 = k**2, k**4, k**6
+    k8, k10 = k**8, k**10
+    H2, H4, H6 = H**2, H**4, H**6
+    m2, m4, m6 = m**2, m**4, m**6
+
+    m2pH2 = m2 + H2
+    m2p3H2 = m2 + 3.0*H2
+    m2p3H2m_dH = m2p3H2 - dotH
+    m2p3H2p2dH = m2p3H2 + 2.0*dotH
+
+    P = (4.0*(m2p3H2 + 3.0*dotH)*k4
+         + 12.0*a2*(m2pH2*m2p3H2 + 2.0*m2pH2*dotH - dotH**2)*k2
+         + 9.0*a4*m2pH2*m2p3H2m_dH*m2p3H2p2dH)
+    if P <= 1e-200:
+        return 1e-200, 1e-200
+
+    KB = a4/P * (-4.0*dotH**2*k6 + 3.0*a2*m2pH2*m2p3H2m_dH*m2p3H2p2dH*k4)
+
+    c10 = (12.0*m2pH2*m2p3H2**3
+           + 16.0*m2p3H2**2*(6.0*m2+7.0*H2)*dotH
+           + 4.0*m2p3H2*(63.0*m2+71.0*H2)*dotH**2
+           + 8.0*(25.0*m2+27.0*H2)*dotH**3 - 48.0*dotH**4
+           - 32.0*H*m2p3H2*dotH*ddotH - 48.0*H*dotH**2*ddotH)
+
+    brkt = (2.0*m2pH2*m2p3H2**2*(2.0*m2+5.0*H2)
+            + m2p3H2*(19.0*m4+64.0*m2*H2+49.0*H4)*dotH
+            + 2.0*(7.0*m4+20.0*m2*H2+17.0*H4)*dotH**2
+            - (23.0*m2+25.0*H2)*dotH**3 + 2.0*dotH**4
+            - 2.0*H*m2pH2*m2p3H2*ddotH - 4.0*H*m2pH2*dotH*ddotH)
+    c8 = 12.0*a2*m2p3H2p2dH*brkt
+
+    c6 = (9.0*a4*m2pH2*m2p3H2m_dH*m2p3H2p2dH**2
+          * (7.0*m2pH2*m2p3H2 + 17.0*m2pH2*dotH - 8.0*dotH**2))
+    c4 = 27.0*a6*m2pH2**2*m2p3H2m_dH**2*m2p3H2p2dH**3
+
+    MB = a6/P**2 * (c10*k10 + c8*k8 + c6*k6 + c4*k4)
+    return KB, MB
+
+
 OMEGA2_FUNC = {
     'tensor_minimal': _omega2_tensor_minimal,
     'vector_minimal': _omega2_vector_minimal,
+    'tensor_nonmin': _omega2_tensor_nonmin,
+    'vector_nonmin': _omega2_vector_nonmin,
+    'scalar_nonmin': _omega2_scalar_nonmin,
 }
 
 
@@ -672,28 +785,33 @@ def run_quick(rtol=1e-9, atol=1e-14):
 # ============================================================
 
 def run_full():
-    """Compute full spectra for tensor and vector minimal sectors."""
+    """Compute full spectra for all sectors."""
     print("=" * 60)
     print("CGPP Numerics: Full spectrum")
     print("=" * 60)
 
     print("\n[1] Solving background...")
-    bg = solve_background(N_extra=4.0)
+    bg = solve_background(N_extra=5.0)
 
     print("\n[2] Computing spectra...")
     masses = [2.0, 3.0, 4.0, 5.0]
-    sectors = ['tensor_minimal', 'vector_minimal']
+    sectors = ['tensor_minimal', 'vector_minimal', 'tensor_nonmin', 'vector_nonmin']
 
     spectra = {}
     for sector in sectors:
         for mv in masses:
             key = f"{sector}_m{mv:.1f}"
-            spectra[key] = compute_spectrum(
-                bg, mv, sector=sector,
-                k_min=0.03, k_max=20.0, n_k=20,
-                N_start_offset=3.0, N_extra=4.0,
-                A_threshold=0.01, N_buffer=0.7,
-                verbose=True)
+            print(f"\n  --- {key} ---")
+            try:
+                spectra[key] = compute_spectrum(
+                    bg, mv, sector=sector,
+                    k_min=0.03, k_max=50.0, n_k=40,
+                    N_start_offset=3.0, N_extra=5.0,
+                    A_threshold=0.01, N_buffer=0.7,
+                    verbose=True)
+            except Exception as e:
+                print(f"    ERROR: {e}")
+                import traceback; traceback.print_exc()
 
     # Save first (robust against post-processing errors)
     outdir = '/root/Agents/Spin2CGPP/Code/output'
