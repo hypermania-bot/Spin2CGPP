@@ -439,6 +439,20 @@ and \(M_B\) equal to the coefficient polynomial printed in eq.~(3.70). Here \(\d
 \item \texttt{Code/test/run\_tests.sh}: shell entry point for the tests.
 \end{itemize}
 
+\section{Numerical results}
+\label{sec:numerical}
+
+The scripts \texttt{Code/script/cgpp\_full.py} and \texttt{Code/script/cgpp\_numerics.py} compute the mode number-density spectra $a^3 n_k / (a_e H_e)^3$ for the hilltop inflation model, using Bunch-Davies initial conditions and Hamiltonian variables $u = \sqrt{aH}\,\tilde{\chi}$ integrated in $N = \ln a$ time. All six sectors (tensor/vector/scalar $\times$ minimal/nonminimal) are implemented. The key numerical results for $m/(\sqrt{2}H_\mathrm{inf}) = 2,3,4,5$ are summarized below.
+
+\subsection{Minimal coupling}
+For the minimally coupled theory, the tensor and vector spectra are nearly identical (within $\sim10\%$), consistent with their mode equations coinciding in the non-relativistic limit. The peak occurs at $k \approx 25\text{--}50\, a_e H_e$ with $a^3 n_k / (a_e H_e)^3 \sim 6\times10^{-3}$ per polarization. The integrated comoving number density per polarization is $\int n_k \,\mathrm{d}\ln k \sim (5\text{--}8)\times10^{-3}$.
+
+\subsection{Nonminimal coupling}
+The tensor sector of the nonminimally coupled theory is similar to the minimal case. The vector sector shows dramatic enhancement near the gradient-instability threshold: at $m/(\sqrt{2}H_\mathrm{inf}) = 2$, the vector nonminimal integrated number density is $\sim0.74$, roughly $120\times$ larger than the minimal tensor sector. For larger masses the enhancement decreases: $m=3$ gives $\sim0.14$ ($25\times$), $m=4$ gives $\sim0.041$ ($6\times$), and $m=5$ gives $\sim0.018$ ($3\times$). This behavior matches the trend described in the paper's Fig.\ 6.
+
+\subsection{Low-$k$ behavior}
+For $m > 1.5 H_\mathrm{inf}$, the index $\nu = \sqrt{9/4 - m^2/H_\mathrm{inf}^2}$ is imaginary, and the paper predicts $n_k \propto k^3$ with oscillations in $\ln k$. Our numerical spectra show oscillations in $\ln k$ at low $k$, but the overall envelope does not follow a simple $k^3$ power law across the full low-$k$ range, likely due to differences in the post-inflation background model (the present code uses an analytic $\epsilon(N)$ continuation rather than the full oscillatory inflaton solution).
+
 \section{Current status}
 The minimally coupled scalar-sector derivation is automated from the covariant quadratic action through the paper's reduced-action coefficient basis and the coupled mode-equation structure. The nonminimally coupled scalar-sector derivation is also automated from the covariant quadratic action through the paper's \(K_B,M_B\) basis and canonical mode equation. The remaining possible extension is to add covariant-action vector-sector reductions; the current vector tests start from the reduced vector Lagrangians quoted in the paper.
 
