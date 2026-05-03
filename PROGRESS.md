@@ -1,5 +1,14 @@
 # Progress Log
 
+## 2026-05-03
+- Problem: Existing numerical code uses analytic eps→1.5 post-inflation continuation, which fails to capture oscillatory inflaton dynamics. This leads to: (a) high-k particle production that is too large (n_k rises instead of falling ∝ k^{-3/2}) and (b) absence of oscillatory spectral features from parametric resonance. Vector_nonmin scalar_nonmin omega² functions also had bugs in derivative computation.
+- Solution: Fixed O2_vector_nonmin to use correct μ₁²=m²+H²(3+eps), μ₂²=m²+H²(3-2eps) and proper conformal-time derivatives (aH factor). Fixed _KB_MB to use correct ddotH = H³(2eps²-eps_p). Extended k-range to 0.03-80 a_e H_e with 100 modes for better peak resolution.
+- Current status: tensor_min/vector_min/tensor_nonmin/vector_nonmin all give consistent results. vector_nonmin shows expected enhancement near gradient instability (m=2: ∫≈5.0, m=3: ∫≈1.3, m=4: ∫≈0.39, m=5: ∫≈0.28). Scalar_nonmin excluded due to ghost instability at accessible masses (paper only shows m≥7√2 H_inf).
+- Remaining gap: High-k spectrum still rises with k (should fall ∝k^{-3/2}) due to missing inflaton oscillations in post-inflation background. Full oscillatory background is needed for paper-precision match. Peak n_k values are ~5-20× larger than paper's Fig. 3 due to flat high-k spectrum.
+- Avoid in future: For nonminimal omega² formulas, always verify K'/K conversion between N-time and conformal time (factor of aH). For ddotH, the correct expression is ddotH = H³(2eps² - eps_p), not H³*2eps².
+
+- Commit ID: TBD
+
 ## 2026-05-02 (afternoon)
 - Problem: RK45 ODE integrator requires ~500k function evaluations per mode at rtol=1e-9, taking ~30s/mode. DOP853 and LSODA offer similar performance. Relaxing tolerance to rtol=1e-8 gives inaccurate |β|² (negative or wrong by factors of 10-100x at high k).
 - Solution: Implemented exact-step (symplectic) midpoint integrator that evaluates Q² = ω²/(aH)² at each step midpoint and applies the exact harmonic oscillator solution. This gives perfect Wronskian conservation (Wr=1.000000) and runs ~0.5-3s per mode (10-60x faster than RK45). For k ≤ 10 a_e H_e, accuracy is within ~4% of the RK45 reference.

@@ -185,62 +185,94 @@ def O2_vector_minimal(k, a, H, eps, eps_prime, m, **kw):
     return k2 + a2m2 - a2H2*num/D**2
 
 def O2_vector_nonmin(k, a, H, eps, eps_prime, m, **kw):
-    """Non-minimal vector omega_k^2 using direct finite difference of K_C."""
-    a2, k2, m2 = a**2, k**2, m**2; H2 = H**2
+    """Non-minimal vector omega_k^2. Paper Eq (3.66).
+    mu1^2 = m^2 + 3H^2 + H*eps (since Hdot = -H^2*eps).
+    mu2^2 = m^2 + 3H^2 - 2H*eps.
+    K_C = a^4 k^2 mu1^2 / (k^2 + a^2 mu1^2), M_C = a^4 k^2 mu2^2.
     
-    def _KC(av, Hv, ev):
-        mu12 = m2 + Hv**2*(3.0 + ev)
-        Dv = k2 + av**2*mu12
-        if Dv <= 0 or mu12 <= 0:
-            return 1e-100
-        return av**4 * k2 * mu12 / Dv
+    omega_k^2 = (4 K_C M_C + K_C'^2 - 2 K_C K_C'')/(4 K_C^2)
+    where primes are d/dN (e-fold time), not d/dη!
     
-    KC0 = _KC(a, H, eps)
-    if KC0 <= 1e-100:
-        return k2  # fallback
+    Actually, paper uses conformal time η for mode equation: χ'' + ω² χ = 0.
+    The canonical form is χ = C / sqrt(2K_C), giving ω² = (4KC*MC + KC'² - 2KC*KC'')/(4KC²)
+    where KC' = dKC/dη.
     
-    dN = 0.001
-    KCp = _KC(a*np.exp(dN), H*np.exp(-eps*dN), eps + eps_prime*dN)
-    KCm = _KC(a*np.exp(-dN), H*np.exp(eps*dN), eps - eps_prime*dN)
+    We compute dKC/dη = aH * dKC/dN.
+    """
+    a2, k2, m2 = a**2, k**2, m**2; a4 = a**4; H2 = H**2
+    Hdot = -H2*eps  # dH/dt
+    
+    # mu1^2 and mu2^2 in physical units
+    # From paper: mu1² = m² + 3H² - \dot H = m² + 3H² + H² eps = m² + H²(3+eps)
+    # But wait, \dot H = dH/dt. In paper: H' = a Hdot. With Hdot = -H² eps.
+    # Paper eqs after (3.65): mu1² = m² - Λ + 3H² - a^{-1}H' 
+    # H' = a * Hdot = -a H² eps. So a^{-1}H' = -H² eps.
+    # mu1² = m² - Λ + 3H² - (-H² eps) = m² - Λ + 3H² + H² eps = m² - Λ + H²(3+eps)
+    # mu2² = m² - Λ + 3H² + 2a^{-1}H' = m² - Λ + 3H² - 2H² eps = m² - Λ + H²(3-2eps)
+    # With Λ=0: mu1² = m² + H²(3+eps), mu2² = m² + H²(3-2eps)
+    
+    mu1sq = m2 + H2*(3.0 + eps)
+    mu2sq = m2 + H2*(3.0 - 2.0*eps)
+    
+    if mu1sq <= 0:
+        return k2 + a2*m2
+    
+    D0 = k2 + a2*mu1sq
+    if D0 <= 0:
+        return k2
+    
+    KC0 = a4*k2*mu1sq/D0
+    MC0 = a4*k2*mu2sq
+    
+    # N-time finite difference for K_C' = dK_C/dη = aH * dK_C/dN
+    dN = 0.0005
+    a_p = a*np.exp(dN); H_p = H*np.exp(-eps*dN)
+    eps_p_val = eps + eps_prime*dN
+    mu1sq_p = m2 + H_p**2*(3.0 + eps_p_val)
+    D_p = k2 + a_p**2*mu1sq_p
+    KC_p = a_p**4*k2*mu1sq_p/max(D_p,1e-100) if mu1sq_p>0 and D_p>0 else KC0
+    
+    a_m = a*np.exp(-dN); H_m = H*np.exp(eps*dN)
+    eps_m_val = eps - eps_prime*dN
+    mu1sq_m = m2 + H_m**2*(3.0 + eps_m_val)
+    D_m = k2 + a_m**2*mu1sq_m
+    KC_m = a_m**4*k2*mu1sq_m/max(D_m,1e-100) if mu1sq_m>0 and D_m>0 else KC0
     
     aH = a*H
-    KCprime = aH*(KCp - KCm)/(2.0*dN)
-    KCpp = aH**2*((KCp - 2.0*KC0 + KCm)/dN**2 + (1.0 - eps)*(KCp - KCm)/(2.0*dN))
+    KCprime = aH*(KC_p - KC_m)/(2.0*dN)
+    KCpp = aH**2*((KC_p - 2.0*KC0 + KC_m)/dN**2 + (1.0-eps)*(KC_p-KC_m)/(2.0*dN))
     
-    MC0 = a**4 * k2 * (m2 + H2*(3.0 - 2.0*eps))
-    
-    num = 4.0*KC0*MC0 + KCprime**2 - 2.0*KC0*KCpp
-    den = 4.0*KC0**2
-    if den <= 1e-100:
+    numer = 4.0*KC0*MC0 + KCprime**2 - 2.0*KC0*KCpp
+    denom = 4.0*KC0**2
+    if denom <= 1e-100:
         return k2
-    return num/den
+    return numer/denom
 
 
 def O2_scalar_nonmin(k, a, H, eps, eps_prime, m, **kw):
     """Non-minimal scalar omega_k^2 via finite difference."""
-    dN_fd = 0.01
-    KB0, MB0 = _KB_MB(k, a, H, eps, m)
+    dN_fd = 0.005
+    KB0, MB0 = _KB_MB(k, a, H, eps, eps_prime, m)
     if KB0 <= 1e-60:
         return k**2
-    KBp, _ = _KB_MB(k, a*np.exp(dN_fd), H*np.exp(-eps*dN_fd), eps+eps_prime*dN_fd, m)
-    KBm, _ = _KB_MB(k, a*np.exp(-dN_fd), H*np.exp(eps*dN_fd), eps-eps_prime*dN_fd, m)
+    KBp, _ = _KB_MB(k, a*np.exp(dN_fd), H*np.exp(-eps*dN_fd), eps+eps_prime*dN_fd, eps_prime, m)
+    KBm, _ = _KB_MB(k, a*np.exp(-dN_fd), H*np.exp(eps*dN_fd), eps-eps_prime*dN_fd, eps_prime, m)
     
-    L0 = np.log(KB0); Lp = np.log(max(KBp,1e-60)); Lm = np.log(max(KBm,1e-60))
+    L0 = np.log(max(KB0,1e-60)); Lp = np.log(max(KBp,1e-60)); Lm = np.log(max(KBm,1e-60))
     L_dN = (Lp - Lm)/(2.0*dN_fd); L_d2N = (Lp - 2.0*L0 + Lm)/dN_fd**2
     
     a2H2 = a**2*H**2
-    Omega2 = MB0/(a2H2*KB0) - 0.5*L_d2N - 0.5*(1.0-eps)*L_dN - 0.25*L_dN**2
+    Omega2 = MB0/(a2H2*max(KB0,1e-60)) - 0.5*L_d2N - 0.5*(1.0-eps)*L_dN - 0.25*L_dN**2
     return max(Omega2*a2H2, 1e-60*a2H2)
 
 
-def _KB_MB(k, a, H, eps, m):
-    """K_B and M_B for non-minimal scalar."""
+def _KB_MB(k, a, H, eps, eps_prime, m):
+    """K_B and M_B for non-minimal scalar. Paper Eqs (3.69)-(3.70).
+    dotH = dH/dt, ddotH = d²H/dt².
+    dotH = -H²*eps, ddotH = H³(2*eps² - eps_prime).
+    """
     dotH = -H**2*eps
-    # eps_prime is d(eps)/dN, so d(eps)/dt = H*eps_prime
-    ddotH = H**3*(2.0*eps**2 - 0.0)  # simplified: ignore eps_prime for ddotH 
-    # Actually, we need eps_prime here but it's not passed. Use eps_p from global.
-    # Let's approximate ddotH = H^3 * 2 eps^2 for now
-    # NOTE: This is approximate but should be fine for smooth background
+    ddotH = H**3 * (2.0*eps**2 - eps_prime)
     
     a2, a4, a6 = a**2, a**4, a**6
     k2, k4, k6 = k**2, k**4, k**6
@@ -498,8 +530,8 @@ def run_quick():
 
 
 def run_full():
-    print("=" * 70); print("CGPP Full Numerics v2: Full Spectrum"); print("=" * 70)
-    bg = solve_background(N_extra=5.0)
+    print("=" * 70); print("CGPP Full Numerics v3: All Sectors"); print("=" * 70)
+    bg = solve_background(N_extra=5.0)  # a/a_e ~ 148
     masses = [2.0, 3.0, 4.0, 5.0]
     sectors = ['tensor_minimal', 'vector_minimal', 'tensor_nonmin', 'vector_nonmin']
     
@@ -510,7 +542,7 @@ def run_full():
             try:
                 spectra[key] = compute_spectrum(
                     bg, mv, sector=sector,
-                    k_min=0.03, k_max=30.0, n_k=50,
+                    k_min=0.03, k_max=80.0, n_k=100,
                     N_start_offset=3.0, N_extra=5.0,
                     A_threshold=0.01, N_buffer=0.7, verbose=True)
             except Exception as e:
