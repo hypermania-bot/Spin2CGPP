@@ -7,7 +7,7 @@
 - Remaining gap: High-k spectrum still rises with k (should fall ∝k^{-3/2}) due to missing inflaton oscillations in post-inflation background. Full oscillatory background is needed for paper-precision match. Peak n_k values are ~5-20× larger than paper's Fig. 3 due to flat high-k spectrum.
 - Avoid in future: For nonminimal omega² formulas, always verify K'/K conversion between N-time and conformal time (factor of aH). For ddotH, the correct expression is ddotH = H³(2eps² - eps_p), not H³*2eps².
 
-- Commit ID: TBD
+- Commit ID: `9fc6060`
 
 ## 2026-05-02 (afternoon)
 - Problem: RK45 ODE integrator requires ~500k function evaluations per mode at rtol=1e-9, taking ~30s/mode. DOP853 and LSODA offer similar performance. Relaxing tolerance to rtol=1e-8 gives inaccurate |β|² (negative or wrong by factors of 10-100x at high k).
